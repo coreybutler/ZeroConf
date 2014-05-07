@@ -12,7 +12,7 @@
  *
  */
 
-package com.ecor.mdns;
+package com.ecor;
 
 import java.io.IOException;
 import java.util.Arrays;
