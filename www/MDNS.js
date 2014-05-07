@@ -50,7 +50,7 @@
 //  }
 //};
 
-module.exports = ZeroConf;
+//module.exports = ZeroConf;
 
 var exec = require('cordova/exec');
 
