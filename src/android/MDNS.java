@@ -40,7 +40,7 @@ import javax.jmdns.ServiceEvent;
 import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
 
-public class ZeroConf extends CordovaPlugin {
+public class MDNS extends CordovaPlugin {
   WifiManager.MulticastLock lock;
 
   private JmDNS jmdns = null;
