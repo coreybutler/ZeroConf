@@ -78,26 +78,22 @@ public class ZeroConf extends CordovaPlugin {
       CallbackContext callbackContext) {
     this.callback = callbackContext;
 
-    switch (action.toLowerCase(Locale.US)) {
-      case "get":
-        JSONArray arr = new JSONArray();
-        try {
-          final String type = args.optString(0);
-          ServiceInfo svc[] = jmdns.list(type);
-          services = svc;
-          for (int i=0; i<svc.length; i++){
-            arr.put(jsonifyService(svc[i]));
-          }
-          PluginResult result = new PluginResult(PluginResult.Status.OK,arr);
-          result.setKeepCallback(true);
-          callback.sendPluginResult(result);
-        } catch (Exception e) {
-          e.printStackTrace();
+    if (action.equals("get")) {
+      JSONArray arr = new JSONArray();
+      try {
+        final String type = args.optString(0);
+        ServiceInfo svc[] = jmdns.list(type);
+        services = svc;
+        for (int i=0; i<svc.length; i++){
+          arr.put(jsonifyService(svc[i]));
         }
-        break;
-    }
-
-    if (action.equals("watch")) {
+        PluginResult result = new PluginResult(PluginResult.Status.OK,arr);
+        result.setKeepCallback(true);
+        callback.sendPluginResult(result);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    } else if (action.equals("watch")) {
       final String type = args.optString(0);
       if (type != null) {
         cordova.getThreadPool().execute(new Runnable() {
