@@ -68,7 +68,7 @@ var MDNS = function(type){
         var me = this;
 
         this.listening = true;
-
+alert(type);
         return exec(function(result) {
           var data = typeof result === 'object' ? result : {
             action: result,
