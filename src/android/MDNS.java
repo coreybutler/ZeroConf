@@ -27,8 +27,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.InetAddress;
+import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.security.MessageDigest;
+
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiInfo;
 import android.util.Log;
@@ -41,7 +44,7 @@ import javax.jmdns.ServiceListener;
 public class MDNS extends CordovaPlugin {
   WifiManager.MulticastLock lock;
 
-  private String TAG = "MDNS";
+  private static String TAG = "MDNS";
   private JmDNS jmdns;
   private ServiceListener listener;
   private CallbackContext callback;
@@ -49,7 +52,7 @@ public class MDNS extends CordovaPlugin {
   private ServiceInfo[] services;
 
   private static interface Response {
-    public static final String ADDED = "added";
+    public static final String ADDED = "available";
     public static final String REMOVED = "removed";
     public static final String RESOLVED = "resolved";
   }
@@ -155,6 +158,7 @@ public class MDNS extends CordovaPlugin {
       @Override
       public void run() {
         services = jmdns.list(t);
+        Log.d(TAG,Arrays.toString(services));
       }
     }, 0, 1000);
 
@@ -259,6 +263,7 @@ public class MDNS extends CordovaPlugin {
         addresses.put(add[i]);
       }
       obj.put("addresses", addresses);
+
       JSONArray urls = new JSONArray();
 
       String[] url = info.getURLs();
@@ -266,6 +271,18 @@ public class MDNS extends CordovaPlugin {
         urls.put(url[i]);
       }
       obj.put("urls", urls);
+
+      // Generate an MD5 checksum for unique ID (even if re-broadcast)
+      String raw = info.getType()+addresses.toString()+Integer.toString(info.getPort())+info.getQualifiedName();
+      byte[] bytesOfMessage;
+      try {
+        bytesOfMessage = raw.getBytes("UTF-8");
+          MessageDigest md = MessageDigest.getInstance("MD5");
+          byte[] digest = md.digest(bytesOfMessage);
+          obj.put("md5", digest.toString());
+      } catch (Exception e) {
+        Log.e(TAG,"Unsupported encoding.");
+      }
 
     } catch (JSONException e) {
       e.printStackTrace();
