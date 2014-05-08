@@ -89,13 +89,13 @@ var MDNS = function(type){
 
           if (data.action === 'available'){
             me._services[data.service.type] = me._services[data.service.type] || {};
-            var key = data.service.uuid || data.service.qualifiedname,
+            var key = data.service.md5 || data.service.qualifiedname,
                 obj = data.service;
-            obj.uuid && delete obj.uuid;
+            obj.md5 && delete obj.md5;
             me._services[data.service.type][key] = obj;
           }
           if (data.action === 'unavailable'){
-            var key = data.service.uuid || data.service.qualifiedname;
+            var key = data.service.md5 || data.service.qualifiedname;
             me.services[data.service.type][key] && delete me.services[data.service.type][key];
           }
 
