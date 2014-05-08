@@ -15,7 +15,6 @@
 package com.ecor;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
@@ -43,7 +42,7 @@ public class MDNS extends CordovaPlugin {
   WifiManager.MulticastLock lock;
 
   private String TAG = "MDNS";
-  private JmDNS jmdns = null;
+  private JmDNS jmdns;
   private ServiceListener listener;
   private CallbackContext callback;
   private InetAddress addr;
@@ -87,8 +86,8 @@ public class MDNS extends CordovaPlugin {
     Log.d(TAG,"Action called: "+action);
     if (action.equals("monitor")) {
       final String type = args.optString(0);
-      Log.d(TAG,type);
       if (type != null) {
+      Log.d(TAG,type);
         cordova.getThreadPool().execute(new Runnable() {
           public void run() {
             watch(type); // Thread-safe.
@@ -164,12 +163,12 @@ public class MDNS extends CordovaPlugin {
     jmdns.addServiceListener(type, listener);
   }
 
-  private void unwatch(String type) {
-    if (jmdns == null) {
-      return;
-    }
-    jmdns.removeServiceListener(type, listener);
-  }
+//  private void unwatch(String type) {
+//    if (jmdns == null) {
+//      return;
+//    }
+//    jmdns.removeServiceListener(type, listener);
+//  }
 
   private void register(String type, String name, int port, String text) {
     if (name == null) {

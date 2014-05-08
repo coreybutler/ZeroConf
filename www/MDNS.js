@@ -81,7 +81,7 @@ var MDNS = function(_type){
           }
         }, function(e){
           throw e;
-        }, "MDNS", "monitor", [type]);
+        }, "MDNS", "monitor", [_type]);
       }
     }
   });
