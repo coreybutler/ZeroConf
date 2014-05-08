@@ -111,25 +111,6 @@ var MDNS = function(_type){
           throw e;
         }, "MDNS", "monitor", [me.type]);
       }
-    },
-    list: {
-      enumerable: true,
-      writable: false,
-      configurable: false,
-      value: function(callback){
-        alert(this.type);
-        return exec(function(result){
-          var data = typeof result === 'object' ? result : {
-            action: result,
-          };
-          if (data.action !== 'list') {
-            return;
-          }
-          callback && callback(data.services);
-        }, function(e){
-          throw e;
-        }, "MDNS", "list", [this.type]);
-      }
     }
   });
 

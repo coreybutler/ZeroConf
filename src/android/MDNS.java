@@ -1,7 +1,13 @@
 /**
- * ZeroConf plugin for Cordova/Phonegap
+ * MDNS plugin for Cordova/Phonegap
  *
- * Copyright (c) 2013-2014 Vlad Stirbu <vlad.stirbu@ieee.org>
+ * Copyright (c) 2013-2014 Corey Butler <corey@coreybutler.com>
+ * Rewrote JavaScript
+ * Updated Java plugin
+ * Added some iOS skeleton code
+ * Renamed from ZeroConf to MDNS
+ *
+ * @author Vlad Stirbu
  * Converted to Cordova 3.x
  * Refactored initialization
  * MIT License
@@ -89,38 +95,7 @@ public class MDNS extends CordovaPlugin {
 
     Log.d(TAG,"Action called: "+action);
     Log.d(TAG,args.toString());
-    if (action.equals("list")) {
-      final String type = args.optString(0);
-      if (type != null) {
-        try {
-          if (jmdns == null){
-            jmdns = JmDNS.create(addr);
-          }
-          ServiceInfo svc[] = jmdns.list(type);
-          services = svc;
-          JSONObject obj = new JSONObject();
-          JSONArray json = new JSONArray();
-          for (int i=0; i< svc.length; i++){
-            json.put(jsonifyService(svc[i]));
-          }
-          obj.put("action", Response.LIST);
-          obj.put("services", json);
-
-          PluginResult result = new PluginResult(PluginResult.Status.OK,obj);
-          result.setKeepCallback(true);
-          callbackContext.sendPluginResult(result);
-          return true;
-        } catch (Exception e) {
-          Log.d(TAG,"Error generating JSON");
-          e.printStackTrace();
-          callbackContext.error("Error generating JSON.");
-          return false;
-        }
-      } else {
-        callbackContext.error("Service type not specified.");
-        return false;
-      }
-    } else if (action.equals("monitor")) {
+    if (action.equals("monitor")) {
       final String type = args.optString(0);
       if (type != null) {
         Log.d(TAG,"Monitor type: "+type);
@@ -152,7 +127,6 @@ public class MDNS extends CordovaPlugin {
       } else {
         callbackContext.error("Missing required service info.");
         return false;
-
       }
     } else if (action.equals("close")) {
       if (jmdns != null) {
@@ -183,6 +157,8 @@ public class MDNS extends CordovaPlugin {
       setupWatcher();
     }
 
+    Log.d(TAG,Arrays.toString(services));
+
     // Create a timer to list services every second
     Timer timer = new Timer();
     final String t = type;
@@ -192,7 +168,7 @@ public class MDNS extends CordovaPlugin {
         services = jmdns.list(t);
         Log.d(TAG,Arrays.toString(services));
       }
-    }, 0, 1000);
+    }, 0, 1500);
 
 
     Log.d(TAG, "Watch " + type);
