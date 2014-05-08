@@ -86,10 +86,10 @@ var MDNS = function(_type){
         this.listening = true;
 
         return exec(function(result) {
-          alert('JAVA CALLED: '+data.action);
           var data = typeof result === 'object' ? result : {
             action: result,
           };
+alert('JAVA CALLED: '+data.action);
 
           if (data.action === 'list'){
             return;
