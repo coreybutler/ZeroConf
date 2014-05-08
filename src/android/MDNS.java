@@ -90,20 +90,22 @@ public class MDNS extends CordovaPlugin {
     Log.d(TAG,"Action called: "+action);
     Log.d(TAG,args.toString());
     if (action.equals("list")) {
+      Log.d(TAG,"list called");
       final String type = args.optString(0);
       if (type != null) {
         try {
-          ServiceInfo svc[] = jmdns.list(type);
-          //services = svc;
-          JSONObject obj = new JSONObject();
-          JSONArray json = new JSONArray();
-          for (int i=0; i< svc.length; i++){
-            json.put(jsonifyService(svc[i]));
-          }
-          obj.put("action", Response.LIST);
-          obj.put("services", json);
+//          ServiceInfo svc[] = jmdns.list(type);
+//          services = svc;
+//          JSONObject obj = new JSONObject();
+//          JSONArray json = new JSONArray();
+//          for (int i=0; i< svc.length; i++){
+//            json.put(jsonifyService(svc[i]));
+//          }
+//          obj.put("action", Response.LIST);
+//          obj.put("services", json);
+          Log.d(TAG,"test of list");
 
-          PluginResult result = new PluginResult(PluginResult.Status.OK,obj);
+          PluginResult result = new PluginResult(PluginResult.Status.OK,"list yo");
           result.setKeepCallback(true);
           callbackContext.sendPluginResult(result);
           return true;
