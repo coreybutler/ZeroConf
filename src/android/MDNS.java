@@ -55,6 +55,7 @@ public class MDNS extends CordovaPlugin {
     public static final String ADDED = "available";
     public static final String REMOVED = "removed";
     public static final String RESOLVED = "resolved";
+    public static final String LIST = "list";
   }
 
   @Override
@@ -88,7 +89,34 @@ public class MDNS extends CordovaPlugin {
 
     Log.d(TAG,"Action called: "+action);
     Log.d(TAG,args.toString());
-    if (action.equals("monitor")) {
+    if (action.equals("list")) {
+      final String type = args.optString(0);
+        if (type != null) {
+          try {
+            ServiceInfo svc[] = jmdns.list(type);
+            services = svc;
+            JSONObject obj = new JSONObject();
+            JSONArray json = new JSONArray();
+            for (int i=0; i< svc.length; i++){
+              json.put(jsonifyService(svc[i]));
+            }
+            obj.put("action", Response.LIST);
+            obj.put("services", json);
+
+            PluginResult result = new PluginResult(PluginResult.Status.OK,obj);
+              result.setKeepCallback(true);
+              callbackContext.sendPluginResult(result);
+              return true;
+          } catch (Exception e) {
+            e.printStackTrace();
+            callbackContext.error("Error generating JSON.");
+            return false;
+          }
+        } else {
+          callbackContext.error("Service type not specified.");
+          return false;
+        }
+    } else if (action.equals("monitor")) {
       final String type = args.optString(0);
       if (type != null) {
         Log.d(TAG,"Monitor type: "+type);

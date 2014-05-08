@@ -1,10 +1,14 @@
 var exec = require('cordova/exec');
 
-var MDNS = function(type){
-
-  type = type || "_http._tcp.";
+var MDNS = function(_type){
 
   Object.defineProperties(this,{
+    type: {
+      enumerable: true,
+      get: function(){
+        return _type || "_http._tcp.";
+      }
+    },
     _services: {
       enumerable: false,
       writable: true,
@@ -82,10 +86,14 @@ var MDNS = function(type){
         this.listening = true;
 
         return exec(function(result) {
+          alert('JAVA CALLED: '+data.action);
           var data = typeof result === 'object' ? result : {
             action: result,
           };
-          alert('JAVA CALLED: '+data.action);
+
+          if (data.action === 'list'){
+            return;
+          }
 
           if (data.action === 'available'){
             me._services[data.service.type] = me._services[data.service.type] || {};
@@ -102,7 +110,22 @@ var MDNS = function(type){
           callback && callback(data);
         }, function(e){
           throw e;
-        }, "MDNS", "monitor", [type]);
+        }, "MDNS", "monitor", [me.type]);
+      }
+    },
+    list: {
+      enumerable: true,
+      writable: false,
+      configurable: false,
+      value: function(callback){
+        var me = this;
+        return exec(function(data){
+          if (data.action !== 'list') {
+            return;
+          }
+          alert(result.services.length);
+          callback && callback(data.services);
+        });
       }
     }
   });
