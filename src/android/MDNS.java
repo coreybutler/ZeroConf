@@ -91,32 +91,32 @@ public class MDNS extends CordovaPlugin {
     Log.d(TAG,args.toString());
     if (action.equals("list")) {
       final String type = args.optString(0);
-        if (type != null) {
-          try {
-            ServiceInfo svc[] = jmdns.list(type);
-            services = svc;
-            JSONObject obj = new JSONObject();
-            JSONArray json = new JSONArray();
-            for (int i=0; i< svc.length; i++){
-              json.put(jsonifyService(svc[i]));
-            }
-            obj.put("action", Response.LIST);
-            obj.put("services", json);
-
-            PluginResult result = new PluginResult(PluginResult.Status.OK,obj);
-            result.setKeepCallback(true);
-            callbackContext.sendPluginResult(result);
-            return true;
-          } catch (Exception e) {
-            Log.d(TAG,"Error generating JSON");
-             e.printStackTrace();
-            callbackContext.error("Error generating JSON.");
-            return false;
+      if (type != null) {
+        try {
+          ServiceInfo svc[] = jmdns.list(type);
+          services = svc;
+          JSONObject obj = new JSONObject();
+          JSONArray json = new JSONArray();
+          for (int i=0; i< svc.length; i++){
+            json.put(jsonifyService(svc[i]));
           }
-        } else {
-          callbackContext.error("Service type not specified.");
+          obj.put("action", Response.LIST);
+          obj.put("services", json);
+
+          PluginResult result = new PluginResult(PluginResult.Status.OK,obj);
+          result.setKeepCallback(true);
+          callbackContext.sendPluginResult(result);
+          return true;
+        } catch (Exception e) {
+          Log.d(TAG,"Error generating JSON");
+           e.printStackTrace();
+          callbackContext.error("Error generating JSON.");
           return false;
         }
+      } else {
+        callbackContext.error("Service type not specified.");
+        return false;
+      }
     } else if (action.equals("monitor")) {
       final String type = args.optString(0);
       if (type != null) {
