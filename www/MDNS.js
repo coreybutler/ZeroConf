@@ -119,11 +119,14 @@ var MDNS = function(_type){
       configurable: false,
       value: function(callback){
         var me = this;
-        return exec(function(data){
+        return exec(function(result){
+          var data = typeof result === 'object' ? result : {
+            action: result,
+          };
           if (data.action !== 'list') {
             return;
           }
-          alert(data.services.length);
+alert("JAVA LIST CALLED");
           callback && callback(data.services);
         }, "MDNS", "list", [me.type]);
       }
