@@ -119,16 +119,16 @@ alert('JAVA CALLED: '+data.action);
       configurable: false,
       value: function(callback){
         var me = this;
-//        return exec(function(result){
+        return exec(function(result){
 //          var data = typeof result === 'object' ? result : {
 //            action: result,
 //          };
 //          if (data.action !== 'list') {
 //            return;
 //          }
-alert("NOT REAL JAVA LIST CALLED");
+alert("JAVA LIST CALLED");
           //callback && callback(data.services);
-//        }, "MDNS", "list", [me.type]);
+        }, "MDNS", "list", [me.type]);
       }
     }
   });
