@@ -93,6 +93,9 @@ public class MDNS extends CordovaPlugin {
       final String type = args.optString(0);
       if (type != null) {
         try {
+          if (jmdns == null){
+            jmdns = JmDNS.create(addr);
+          }
           ServiceInfo svc[] = jmdns.list(type);
           services = svc;
           JSONObject obj = new JSONObject();
@@ -103,13 +106,13 @@ public class MDNS extends CordovaPlugin {
           obj.put("action", Response.LIST);
           obj.put("services", json);
 
-          PluginResult result = new PluginResult(PluginResult.Status.OK,"list yo");
+          PluginResult result = new PluginResult(PluginResult.Status.OK,obj);
           result.setKeepCallback(true);
           callbackContext.sendPluginResult(result);
           return true;
         } catch (Exception e) {
           Log.d(TAG,"Error generating JSON");
-           e.printStackTrace();
+          e.printStackTrace();
           callbackContext.error("Error generating JSON.");
           return false;
         }
