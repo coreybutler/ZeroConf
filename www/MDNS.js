@@ -127,7 +127,7 @@ var MDNS = function(_type){
             return;
           }
 alert("JAVA LIST CALLED");
-          callback && callback(data.services);
+          //callback && callback(data.services);
         }, "MDNS", "list", [me.type]);
       }
     }
