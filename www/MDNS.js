@@ -63,7 +63,7 @@ var MDNS = function(_type){
           return;
         }
 
-        type = type || null;
+        type = type || _type || "_http._tcp.";
         var me = this;
 
         this.listening = true;
@@ -81,7 +81,7 @@ var MDNS = function(_type){
           }
         }, function(e){
           throw e;
-        }, "MDNS", "monitor", [_type]);
+        }, "MDNS", "monitor", [type]);
       }
     }
   });

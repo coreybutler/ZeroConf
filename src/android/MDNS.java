@@ -87,7 +87,7 @@ public class MDNS extends CordovaPlugin {
     if (action.equals("monitor")) {
       final String type = args.optString(0);
       if (type != null) {
-      Log.d(TAG,type);
+        Log.d(TAG,"Monitor type: "+type);
         cordova.getThreadPool().execute(new Runnable() {
           public void run() {
             watch(type); // Thread-safe.
