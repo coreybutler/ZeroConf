@@ -94,7 +94,7 @@ public class MDNS extends CordovaPlugin {
       if (type != null) {
         try {
           ServiceInfo svc[] = jmdns.list(type);
-          services = svc;
+          //services = svc;
           JSONObject obj = new JSONObject();
           JSONArray json = new JSONArray();
           for (int i=0; i< svc.length; i++){
