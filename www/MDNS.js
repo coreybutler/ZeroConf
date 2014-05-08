@@ -89,7 +89,6 @@ var MDNS = function(_type){
           var data = typeof result === 'object' ? result : {
             action: result,
           };
-alert('JAVA CALLED: '+data.action);
 
           if (data.action === 'list'){
             return;
@@ -126,8 +125,7 @@ alert('JAVA CALLED: '+data.action);
           if (data.action !== 'list') {
             return;
           }
-alert("JAVA LIST CALLED");
-          //callback && callback(data.services);
+          callback && callback(data.services);
         }, function(e){
           throw e;
         }, "MDNS", "list", [this.type]);
