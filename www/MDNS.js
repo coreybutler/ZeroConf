@@ -123,7 +123,7 @@ var MDNS = function(_type){
           if (data.action !== 'list') {
             return;
           }
-          alert(result.services.length);
+          alert(data.services.length);
           callback && callback(data.services);
         }, "MDNS", "list", [me.type]);
       }
