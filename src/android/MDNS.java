@@ -273,13 +273,18 @@ public class MDNS extends CordovaPlugin {
       obj.put("urls", urls);
 
       // Generate an MD5 checksum for unique ID (even if re-broadcast)
-      String raw = info.getType()+addresses.toString()+Integer.toString(info.getPort())+info.getQualifiedName();
-      byte[] bytesOfMessage;
       try {
-        bytesOfMessage = raw.getBytes("UTF-8");
+          String raw = info.getType()+addresses.toString()+Integer.toString(info.getPort())+info.getQualifiedName();
           MessageDigest md = MessageDigest.getInstance("MD5");
-          byte[] digest = md.digest(bytesOfMessage);
-          obj.put("md5", digest.toString());
+          md.update(raw.getBytes("UTF-8"));
+          byte[] digest = md.digest();
+          StringBuffer hexString = new StringBuffer();
+        for (int i=0;i<digest.length;i++) {
+         String hex=Integer.toHexString(0xff & digest[i]);
+          if(hex.length()==1) hexString.append('0');
+          hexString.append(hex);
+        }
+          obj.put("md5", hexString);
       } catch (Exception e) {
         Log.e(TAG,"Unsupported encoding.");
       }

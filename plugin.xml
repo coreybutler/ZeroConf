@@ -35,5 +35,19 @@
         <source-file src="src/android/MDNS.java" target-dir="src/com/ecor" />
 
     </platform>
+
+  <!-- ios -->
+    <platform name="ios">
+      <config-file target="config.xml" parent="/*">
+        <feature name="Discovery">
+          <param name="ios-package" value="CDVDiscovery"/>
+          <param name="onload" value="true" />
+        </feature>
+      </config-file>
+
+      <header-file src="src/ios/CDVDiscovery.h" />
+      <source-file src="src/ios/CDVDiscovery.m" />
+    </platform>
+
     <info></info>
 </plugin>
