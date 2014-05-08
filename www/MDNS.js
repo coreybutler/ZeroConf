@@ -61,7 +61,6 @@ var MDNS = function(type){
       writable: false,
       configurable: false,
       value: function(callback){
-alert("TYPE: "+type);
         if (this.listening) {
           return;
         }
@@ -78,7 +77,7 @@ alert("TYPE: "+type);
           callback && callback(data);
         }, function(e){
           throw e;
-        }, "MDNS", "monitor", type);
+        }, "MDNS", "monitor", [type]);
       }
     }
   });

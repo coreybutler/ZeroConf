@@ -80,6 +80,7 @@ public class MDNS extends CordovaPlugin {
 
   @Override
   public boolean execute(String action, JSONArray args, CallbackContext callbackContext) {
+  Log.d(TAG,"Executing an action...");
     this.callback = callbackContext;
 
     Log.d(TAG,"Action called: "+action);
