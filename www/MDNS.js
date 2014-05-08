@@ -125,7 +125,7 @@ var MDNS = function(_type){
           }
           alert(result.services.length);
           callback && callback(data.services);
-        });
+        }, "MDNS", "list", [me.type]);
       }
     }
   });
