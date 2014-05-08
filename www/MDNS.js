@@ -48,13 +48,25 @@ var MDNS = function(_type){
         this.oncehandlers.hasOwnProperty(data.action) && delete this.oncehandlers[data.action];
       }
     },
+    listening: {
+      enumerable: false,
+      writable: true,
+      configurable: false,
+      value: false
+    },
     listen: {
       enumerable: true,
       writable: false,
       configurable: false,
       value: function(type){
+        if (this.listening) {
+          return;
+        }
+
         type = type || null;
         var me = this;
+
+        this.listening = true;
 
         return exec(function(result) {
           var data = typeof result === 'object' ? result : {
@@ -69,7 +81,7 @@ var MDNS = function(_type){
           }
         }, function(e){
           throw e;
-        }, "MDNS", "monitor", []);
+        }, "MDNS", "monitor", [type]);
       }
     }
   });

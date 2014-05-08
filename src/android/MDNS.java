@@ -16,7 +16,6 @@ package com.ecor;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Locale;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
@@ -43,11 +42,18 @@ import javax.jmdns.ServiceListener;
 public class MDNS extends CordovaPlugin {
   WifiManager.MulticastLock lock;
 
+  private String TAG = "MDNS";
   private JmDNS jmdns = null;
   private ServiceListener listener;
   private CallbackContext callback;
   private InetAddress addr;
   private ServiceInfo[] services;
+
+  private static interface Response {
+    public static final String ADDED = "added";
+    public static final String REMOVED = "removed";
+    public static final String RESOLVED = "resolved";
+  }
 
   @Override
   public void initialize(CordovaInterface cordova, CordovaWebView webView) {
@@ -55,7 +61,7 @@ public class MDNS extends CordovaPlugin {
 
     WifiManager wifi = (WifiManager) this.cordova.getActivity()
         .getSystemService(android.content.Context.WIFI_SERVICE);
-    lock = wifi.createMulticastLock("ZeroConfPluginLock");
+    lock = wifi.createMulticastLock(TAG+"PluginLock");
     lock.setReferenceCounted(true);
     lock.acquire();
 
@@ -70,7 +76,7 @@ public class MDNS extends CordovaPlugin {
       e.printStackTrace();
     }
 
-    Log.v("ZeroConf", "Initialized");
+    Log.v(TAG, "Initialized");
   }
 
   @Override
@@ -78,39 +84,14 @@ public class MDNS extends CordovaPlugin {
       CallbackContext callbackContext) {
     this.callback = callbackContext;
 
-    if (action.equals("get")) {
-      JSONArray arr = new JSONArray();
-      try {
-        final String type = args.optString(0);
-        ServiceInfo svc[] = jmdns.list(type);
-        services = svc;
-        for (int i=0; i<svc.length; i++){
-          arr.put(jsonifyService(svc[i]));
-        }
-        PluginResult result = new PluginResult(PluginResult.Status.OK,arr);
-        result.setKeepCallback(true);
-        callback.sendPluginResult(result);
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    } else if (action.equals("watch")) {
+    Log.d(TAG,"Action called: "+action);
+    if (action.equals("monitor")) {
       final String type = args.optString(0);
+      Log.d(TAG,type);
       if (type != null) {
         cordova.getThreadPool().execute(new Runnable() {
           public void run() {
             watch(type); // Thread-safe.
-          }
-        });
-      } else {
-        callbackContext.error("Service type not specified.");
-        return false;
-      }
-    } else if (action.equals("unwatch")) {
-      final String type = args.optString(0);
-      if (type != null) {
-        cordova.getThreadPool().execute(new Runnable() {
-          public void run() {
-            unwatch(type);
           }
         });
       } else {
@@ -138,7 +119,6 @@ public class MDNS extends CordovaPlugin {
         return false;
 
       }
-
     } else if (action.equals("close")) {
       if (jmdns != null) {
         try {
@@ -153,7 +133,7 @@ public class MDNS extends CordovaPlugin {
       }
 
     } else {
-      Log.e("ZeroConf", "Invalid action: " + action);
+      Log.e(TAG, "Invalid action: " + action);
       callbackContext.error("Invalid action.");
       return false;
     }
@@ -179,9 +159,8 @@ public class MDNS extends CordovaPlugin {
     }, 0, 1000);
 
 
-    Log.d("ZeroConf", "Watch " + type);
-    Log.d("ZeroConf",
-        "Name: " + jmdns.getName() + " host: " + jmdns.getHostName());
+    Log.d(TAG, "Watch " + type);
+    Log.d(TAG, "Name: " + jmdns.getName() + " host: " + jmdns.getHostName());
     jmdns.addServiceListener(type, listener);
   }
 
@@ -210,32 +189,30 @@ public class MDNS extends CordovaPlugin {
   }
 
   private void setupWatcher() {
-    Log.d("ZeroConf", "Setup watcher");
+    Log.d(TAG, "Setup watcher");
     try {
       jmdns = JmDNS.create(addr);
       listener = new ServiceListener() {
 
         public void serviceResolved(ServiceEvent ev) {
-          Log.d("ZeroConf", "Resolved");
+          Log.d(TAG, Response.RESOLVED);
 
-          sendCallback("added", ev.getInfo());
+          sendCallback(Response.ADDED, ev.getInfo());
         }
 
         public void serviceRemoved(ServiceEvent ev) {
-          Log.d("ZeroConf", "Removed");
+          Log.d(TAG, Response.REMOVED);
 
-          sendCallback("removed", ev.getInfo());
+          sendCallback(Response.REMOVED, ev.getInfo());
         }
 
         public void serviceAdded(ServiceEvent event) {
-          Log.d("ZeroConf", "Added");
+          Log.d(TAG, Response.ADDED);
 
           // Force serviceResolved to be called again
           jmdns.requestServiceInfo(event.getType(), event.getName(), 1);
         }
       };
-
-      Log.d("ZeroConf","Array list: "+Arrays.toString(jmdns.list("_http._tcp")));
 
     } catch (IOException e) {
       e.printStackTrace();
@@ -248,7 +225,7 @@ public class MDNS extends CordovaPlugin {
     try {
       status.put("action", action);
       status.put("service", jsonifyService(info));
-      Log.d("ZeroConf", "Sending result: " + status.toString());
+      Log.d(TAG, "Sending result: " + status.toString());
 
       PluginResult result = new PluginResult(PluginResult.Status.OK,status);
 
