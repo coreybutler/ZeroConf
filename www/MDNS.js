@@ -77,7 +77,7 @@ var MDNS = function(type){
           callback && callback(data);
         }, function(e){
           throw e;
-        }, "MDNS", "monitor", [type]);
+        }, "MDNS", "monitor", type);
       }
     }
   });
