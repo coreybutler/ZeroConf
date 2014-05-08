@@ -120,14 +120,16 @@ alert('JAVA CALLED: '+data.action);
       value: function(callback){
         alert(this.type);
         return exec(function(result){
-//          var data = typeof result === 'object' ? result : {
-//            action: result,
-//          };
-//          if (data.action !== 'list') {
-//            return;
-//          }
+          var data = typeof result === 'object' ? result : {
+            action: result,
+          };
+          if (data.action !== 'list') {
+            return;
+          }
 alert("JAVA LIST CALLED");
           //callback && callback(data.services);
+        }, function(e){
+          throw e;
         }, "MDNS", "list", [this.type]);
       }
     }
