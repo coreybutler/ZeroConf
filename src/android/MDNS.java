@@ -104,11 +104,12 @@ public class MDNS extends CordovaPlugin {
             obj.put("services", json);
 
             PluginResult result = new PluginResult(PluginResult.Status.OK,obj);
-              result.setKeepCallback(true);
-              callbackContext.sendPluginResult(result);
-              return true;
+            result.setKeepCallback(true);
+            callbackContext.sendPluginResult(result);
+            return true;
           } catch (Exception e) {
-            e.printStackTrace();
+            Log.d(TAG,"Error generating JSON");
+             e.printStackTrace();
             callbackContext.error("Error generating JSON.");
             return false;
           }
