@@ -118,7 +118,7 @@ alert('JAVA CALLED: '+data.action);
       writable: false,
       configurable: false,
       value: function(callback){
-        var me = this;
+        alert(this.type);
         return exec(function(result){
 //          var data = typeof result === 'object' ? result : {
 //            action: result,
@@ -128,7 +128,7 @@ alert('JAVA CALLED: '+data.action);
 //          }
 alert("JAVA LIST CALLED");
           //callback && callback(data.services);
-        }, "MDNS", "list", [me.type]);
+        }, "MDNS", "list", [this.type]);
       }
     }
   });
