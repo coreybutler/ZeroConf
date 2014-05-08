@@ -79,11 +79,11 @@ public class MDNS extends CordovaPlugin {
   }
 
   @Override
-  public boolean execute(String action, JSONArray args,
-      CallbackContext callbackContext) {
+  public boolean execute(String action, JSONArray args, CallbackContext callbackContext) {
     this.callback = callbackContext;
 
     Log.d(TAG,"Action called: "+action);
+    Log.d(TAG,args.toString());
     if (action.equals("monitor")) {
       final String type = args.optString(0);
       if (type != null) {
