@@ -94,7 +94,7 @@ var MDNS = function(_type){
             }
           }, function(e){
             throw e;
-          }, "MDNS", "monitor", [me.type]);
+          }, "MDNS", "macaddress", [me.type]);
         }
         return this.macaddress;
       }
