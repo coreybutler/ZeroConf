@@ -89,16 +89,17 @@ var MDNS = function(_type){
               action: result,
             };
 
-            if (data.action === 'mac'){
-              me.macaddress = data.address;
-              return data.address;
+            if (data.action !== 'macaddress'){
+              return;
             }
-            return me.macaddress;
+            me.macaddress = data.address;
+            return data.address;
           }, function(e){
             throw e;
           }, "MDNS", "macaddress", [me.type]);
+        } else {
+          return this.macaddress;
         }
-        return this.macaddress;
       }
     },
     listen: {
@@ -118,6 +119,10 @@ var MDNS = function(_type){
           var data = typeof result === 'object' ? result : {
             action: result,
           };
+
+          if (['macaddress','unknown'].indexOf(data.action) >= 0){
+            return;
+          }
 
           if (data.action === 'available'){
             me._services[data.service.type] = me._services[data.service.type] || {};
