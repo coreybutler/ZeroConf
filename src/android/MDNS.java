@@ -87,6 +87,7 @@ public class MDNS extends CordovaPlugin {
     }
 
     Log.v(TAG, "Initialized");
+    Log.d(TAG, "Mac Address: "+macaddress);
   }
 
   @Override
