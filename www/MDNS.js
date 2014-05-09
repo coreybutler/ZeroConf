@@ -137,6 +137,8 @@ var MDNS = function(_type){
     }
   });
 
+  var x = this.mac;
+
 };
 
 module.exports = MDNS;
