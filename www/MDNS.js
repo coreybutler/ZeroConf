@@ -83,8 +83,7 @@ var MDNS = function(_type){
       get: function(){
         var me = this;
         if(this.macaddress === null){
-          return exec(function(data){
-            alert('Mac Address Response'+JSON.stringify(data));
+          return exec(function(result){
             var data = typeof result === 'object' ? result : {
               action: result,
             };
