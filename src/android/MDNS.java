@@ -34,6 +34,7 @@ import org.json.JSONObject;
 
 import java.net.InetAddress;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.security.MessageDigest;
@@ -50,13 +51,14 @@ import javax.jmdns.ServiceListener;
 public class MDNS extends CordovaPlugin {
   WifiManager.MulticastLock lock;
 
-  private static String TAG = "MDNS";
   private JmDNS jmdns;
   private ServiceListener listener;
   private CallbackContext callback;
   private InetAddress addr;
   private ServiceInfo[] services;
+  private String macaddress;
 
+  private static String TAG = "MDNS";
   private static interface Response {
     public static final String ADDED = "available";
     public static final String REMOVED = "removed";
@@ -76,6 +78,7 @@ public class MDNS extends CordovaPlugin {
 
     WifiInfo wifiinfo = wifi.getConnectionInfo();
     int intaddr = wifiinfo.getIpAddress();
+    macaddress = wifiinfo.getMacAddress();
 
     byte[] byteaddr = new byte[] { (byte) (intaddr & 0xff), (byte) (intaddr >> 8 & 0xff), (byte) (intaddr >> 16 & 0xff), (byte) (intaddr >> 24 & 0xff) };
 
@@ -95,7 +98,11 @@ public class MDNS extends CordovaPlugin {
 
     Log.d(TAG,"Action called: "+action);
     Log.d(TAG,args.toString());
-    if (action.equals("monitor")) {
+    if (action.equals("macaddress")) {
+      Log.d(TAG,"Retrieved Mac Address: "+macaddress);
+      callbackContext.success(macaddress);
+      return true;
+    } else if (action.equals("monitor")) {
       final String type = args.optString(0);
       if (type != null) {
         Log.d(TAG,"Monitor type: "+type);
@@ -264,6 +271,24 @@ public class MDNS extends CordovaPlugin {
       obj.put("protocol", info.getProtocol());
       obj.put("qualifiedname", info.getQualifiedName());
       obj.put("type", info.getType());
+
+      // Capture the TXT record
+      String x = info.toString();
+      Log.d(TAG,"STRING?: "+info.getApplication());
+      try {
+      JSONObject txtrecs = new JSONObject();
+      Enumeration<String> TxtProperties = info.getPropertyNames();
+      Log.d(TAG,"Enum: "+TxtProperties.toString());
+      while (TxtProperties.hasMoreElements()) {
+        Log.d(TAG,"Prop found");
+        String prop = TxtProperties.nextElement();
+        Log.d(TAG,prop);
+        txtrecs.put(prop,"Unknown");
+      }
+      obj.put("TXT",txtrecs);
+      } catch (Exception e) {
+      e.printStackTrace();
+      }
 
       JSONArray addresses = new JSONArray();
       String[] add = info.getHostAddresses();
