@@ -60,10 +60,12 @@ var MDNS = function(_type){
           alert(data);
           handler.apply(me,[data]);
         });
-        (this.oncehandlers[data.action]||[]).forEach(function(handler){
-          handler.apply(me,[data]);
-        });
-        this.oncehandlers.hasOwnProperty(data.action) && delete this.oncehandlers[data.action];
+        if (this.oncehandlers.hasOwnProperty(data.action)) {
+          (this.oncehandlers[data.action]||[]).forEach(function(handler){
+            handler.apply(me,[data]);
+          });
+          delete this.oncehandlers[data.action];
+        }
       }
     },
     listening: {
@@ -134,6 +136,8 @@ var MDNS = function(_type){
             var key = data.service.md5 || data.service.qualifiedname;
             me.services[data.service.type][key] && delete me.services[data.service.type][key];
           }
+
+          me.handleEvent(data);
 
           callback && callback(data);
         }, function(e){
