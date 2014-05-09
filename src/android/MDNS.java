@@ -34,7 +34,6 @@ import org.json.JSONObject;
 
 import java.net.InetAddress;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.security.MessageDigest;
@@ -63,7 +62,6 @@ public class MDNS extends CordovaPlugin {
     public static final String ADDED = "available";
     public static final String REMOVED = "removed";
     public static final String RESOLVED = "resolved";
-    public static final String LIST = "list";
   }
 
   @Override
@@ -98,10 +96,24 @@ public class MDNS extends CordovaPlugin {
 
     Log.d(TAG,"Action called: "+action);
     Log.d(TAG,args.toString());
-    if (action.equals("macaddress")) {
-      Log.d(TAG,"Retrieved Mac Address: "+macaddress);
-      callbackContext.success(macaddress);
-      return true;
+    if (action.equals("macaddress")){
+      Log.d(TAG,"Mac Address: "+macaddress);
+      final CallbackContext cb = callbackContext;
+      cordova.getThreadPool().execute(new Runnable() {
+      public void run() {
+        JSONObject json = new JSONObject();
+        try {
+          json.put("action", new String("macaddress"));
+            json.put("address", macaddress);
+            PluginResult result = new PluginResult(PluginResult.Status.OK,json);
+            result.setKeepCallback(true);
+            cb.sendPluginResult(result);
+          } catch (Exception e) {
+          e.printStackTrace();
+          cb.error("JSON Error retrieving Mac Address.");
+          }
+      }
+      });
     } else if (action.equals("monitor")) {
       final String type = args.optString(0);
       if (type != null) {
@@ -271,24 +283,6 @@ public class MDNS extends CordovaPlugin {
       obj.put("protocol", info.getProtocol());
       obj.put("qualifiedname", info.getQualifiedName());
       obj.put("type", info.getType());
-
-      // Capture the TXT record
-      String x = info.toString();
-      Log.d(TAG,"STRING?: "+info.getApplication());
-      try {
-      JSONObject txtrecs = new JSONObject();
-      Enumeration<String> TxtProperties = info.getPropertyNames();
-      Log.d(TAG,"Enum: "+TxtProperties.toString());
-      while (TxtProperties.hasMoreElements()) {
-        Log.d(TAG,"Prop found");
-        String prop = TxtProperties.nextElement();
-        Log.d(TAG,prop);
-        txtrecs.put(prop,"Unknown");
-      }
-      obj.put("TXT",txtrecs);
-      } catch (Exception e) {
-      e.printStackTrace();
-      }
 
       JSONArray addresses = new JSONArray();
       String[] add = info.getHostAddresses();

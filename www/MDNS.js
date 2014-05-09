@@ -72,6 +72,33 @@ var MDNS = function(_type){
       configurable: false,
       value: false
     },
+    macaddress: {
+      enumerable: false,
+      writable: true,
+      configurable: false,
+      value: null
+    },
+    mac: {
+      enumerable: true,
+      get: function(){
+        var me = this;
+        if(this.macaddress === null){
+          return exec(function(data){
+            var data = typeof result === 'object' ? result : {
+              action: result,
+            };
+
+            if (data.action === 'mac'){
+              me.macaddress = data.address;
+              return data.address;
+            }
+          }, function(e){
+            throw e;
+          }, "MDNS", "monitor", [me.type]);
+        }
+        return this.macaddress;
+      }
+    },
     listen: {
       enumerable: true,
       writable: false,
@@ -89,10 +116,6 @@ var MDNS = function(_type){
           var data = typeof result === 'object' ? result : {
             action: result,
           };
-
-          if (data.action === 'list'){
-            return;
-          }
 
           if (data.action === 'available'){
             me._services[data.service.type] = me._services[data.service.type] || {};
