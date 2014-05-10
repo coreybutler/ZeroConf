@@ -131,14 +131,15 @@ var MDNS = function(_type){
             obj.md5 && delete obj.md5;
             me._services[data.service.type][key] = obj;
           }
-          if (data.action === 'unavailable'){
-            var key = data.service.md5 || data.service.qualifiedname;
-            me.services[data.service.type][key] && delete me.services[data.service.type][key];
-          }
 
           me.handleEvent(data);
 
           callback && callback(data);
+
+          if (data.action === 'unavailable'){
+            var key = data.service.md5 || data.service.qualifiedname;
+            me.services[data.service.type][key] && delete me.services[data.service.type][key];
+          }
         }, function(e){
           throw e;
         }, "MDNS", "monitor", [me.type]);
