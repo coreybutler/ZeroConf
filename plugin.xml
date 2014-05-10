@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
-        id="com.ecor.MDNS"
+        id="com.ecor.mdns"
         version="1.0.2">
     <engines>
         <engine name="cordova" version=">=3.0.0" />
     </engines>
 
     <name>MDNS</name>
-    <description>A ZeeroConf/Bonjour API based on ZeroConf plugin for Cordova/Phonegap</description>
+    <description>A mDNS/ZeroConf/Bonjour API based on ZeroConf plugin for Cordova/Phonegap</description>
     <author>Corey Butler</author>
     <keywords>mdns,zeroconf,bonjour</keywords>
     <license>MIT</license>
@@ -33,6 +33,7 @@
         <source-file src="src/android/libs/jmdns.jar" target-dir="libs" framework="true" />
 
         <source-file src="src/android/MDNS.java" target-dir="src/com/ecor" />
+        <source-file src="src/android/MdnsServices.java" target-dir="src/com/ecor" />
 
     </platform>
 

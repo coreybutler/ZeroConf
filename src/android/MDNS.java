@@ -54,13 +54,13 @@ public class MDNS extends CordovaPlugin {
   private ServiceListener listener;
   private CallbackContext callback;
   private InetAddress addr;
-  private ServiceInfo[] services;
   private String macaddress;
+  private MdnsServices knownservices = new MdnsServices();
 
   private static String TAG = "MDNS";
   private static interface Response {
     public static final String ADDED = "available";
-    public static final String REMOVED = "removed";
+    public static final String REMOVED = "unavailable";
     public static final String RESOLVED = "resolved";
   }
 
@@ -177,18 +177,31 @@ public class MDNS extends CordovaPlugin {
       setupWatcher();
     }
 
-    Log.d(TAG,Arrays.toString(services));
-
     // Create a timer to list services every second
     Timer timer = new Timer();
     final String t = type;
     timer.scheduleAtFixedRate(new TimerTask() {
       @Override
       public void run() {
-        services = jmdns.list(t);
-        Log.d(TAG,Arrays.toString(services));
+      ServiceInfo[] svcs = jmdns.list(t);
+      try {
+          if (svcs.length > 0) {
+//            for (ServiceInfo i : svcs){
+//              if (!knownservices.has(i)){
+//                Log.i(TAG,"Known services didn't contain the service.");
+//                Log.d(TAG,i.toString());
+//              knownservices.add(i);
+//              sendCallback(Response.ADDED,i);
+//              Log.d(TAG,Response.ADDED+" "+i.getName());
+//              }
+//            }
+          }
+        } catch (Exception e) {
+          Log.d(TAG,"Unknown Issue");
+          e.printStackTrace();
+        }
       }
-    }, 0, 1500);
+    }, 0, 500);
 
 
     Log.d(TAG, "Watch " + type);
@@ -227,19 +240,33 @@ public class MDNS extends CordovaPlugin {
       listener = new ServiceListener() {
 
         public void serviceResolved(ServiceEvent ev) {
-          Log.d(TAG, Response.RESOLVED);
+          Log.d(TAG, Response.RESOLVED+" --> "+ev.getName());
+
+          // Add to known services
+          knownservices.add(ev.getInfo());
 
           sendCallback(Response.ADDED, ev.getInfo());
         }
 
         public void serviceRemoved(ServiceEvent ev) {
-          Log.d(TAG, Response.REMOVED);
+          Log.d(TAG, Response.REMOVED+" --> "+ev.getInfo().getName()+" <== ");
+          try {
+            Log.d(TAG,"BEFORE: "+knownservices.getCount());
+
+            // Remove from known services
+            knownservices.remove(ev.getInfo());
+
+            Log.d(TAG,"AFTER: "+Integer.toString(knownservices.getCount()));
+          } catch (Exception e) {
+            Log.d(TAG,"Exception with knownservices");
+            e.printStackTrace();
+          }
 
           sendCallback(Response.REMOVED, ev.getInfo());
         }
 
         public void serviceAdded(ServiceEvent event) {
-          Log.d(TAG, Response.ADDED);
+          Log.d(TAG, Response.ADDED+" --> "+event.getName());
 
           // Force serviceResolved to be called again
           jmdns.requestServiceInfo(event.getType(), event.getName(), 1);
@@ -299,23 +326,7 @@ public class MDNS extends CordovaPlugin {
         urls.put(url[i]);
       }
       obj.put("urls", urls);
-
-      // Generate an MD5 checksum for unique ID (even if re-broadcast)
-      try {
-          String raw = info.getType()+addresses.toString()+Integer.toString(info.getPort())+info.getQualifiedName();
-          MessageDigest md = MessageDigest.getInstance("MD5");
-          md.update(raw.getBytes("UTF-8"));
-          byte[] digest = md.digest();
-          StringBuffer hexString = new StringBuffer();
-        for (int i=0;i<digest.length;i++) {
-         String hex=Integer.toHexString(0xff & digest[i]);
-          if(hex.length()==1) hexString.append('0');
-          hexString.append(hex);
-        }
-          obj.put("md5", hexString);
-      } catch (Exception e) {
-        Log.e(TAG,"Unsupported encoding.");
-      }
+      obj.put("md5", ServiceMD5(info));
 
     } catch (JSONException e) {
       e.printStackTrace();
@@ -324,6 +335,30 @@ public class MDNS extends CordovaPlugin {
 
     return obj;
 
+  }
+
+  private static String ServiceMD5(ServiceInfo info) {
+  JSONArray addresses = new JSONArray();
+  String[] add = info.getHostAddresses();
+  for (int i = 0; i < add.length; i++) {
+    addresses.put(add[i]);
+  }
+  try {
+      String raw = info.getType()+addresses.toString()+Integer.toString(info.getPort())+info.getQualifiedName();
+      MessageDigest md = MessageDigest.getInstance("MD5");
+      md.update(raw.getBytes("UTF-8"));
+      byte[] digest = md.digest();
+      StringBuffer hexString = new StringBuffer();
+      for (int i=0;i<digest.length;i++) {
+      String hex=Integer.toHexString(0xff & digest[i]);
+      if(hex.length()==1) hexString.append('0');
+      hexString.append(hex);
+      }
+      return hexString.toString();
+  } catch (Exception e) {
+    e.printStackTrace();
+    return null;
+  }
   }
 
 }
