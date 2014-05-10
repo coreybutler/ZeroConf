@@ -186,22 +186,22 @@ public class MDNS extends CordovaPlugin {
       ServiceInfo[] svcs = jmdns.list(t);
       try {
           if (svcs.length > 0) {
-//            for (ServiceInfo i : svcs){
-//              if (!knownservices.has(i)){
-//                Log.i(TAG,"Known services didn't contain the service.");
-//                Log.d(TAG,i.toString());
-//              knownservices.add(i);
-//              sendCallback(Response.ADDED,i);
-//              Log.d(TAG,Response.ADDED+" "+i.getName());
-//              }
-//            }
+            for (ServiceInfo i : svcs){
+              if (!knownservices.contains(i)){
+                Log.i(TAG,"Known services didn't contain the service.");
+                Log.d(TAG,i.toString());
+                knownservices.add(i);
+                sendCallback(Response.ADDED,i);
+                Log.d(TAG,Response.ADDED+" "+i.getName());
+              }
+            }
           }
         } catch (Exception e) {
           Log.d(TAG,"Unknown Issue");
           e.printStackTrace();
         }
       }
-    }, 0, 500);
+    }, 0, 750);
 
 
     Log.d(TAG, "Watch " + type);
@@ -251,14 +251,10 @@ public class MDNS extends CordovaPlugin {
         public void serviceRemoved(ServiceEvent ev) {
           Log.d(TAG, Response.REMOVED+" --> "+ev.getInfo().getName()+" <== ");
           try {
-            Log.d(TAG,"BEFORE: "+knownservices.getCount());
-
             // Remove from known services
             knownservices.remove(ev.getInfo());
-
-            Log.d(TAG,"AFTER: "+Integer.toString(knownservices.getCount()));
           } catch (Exception e) {
-            Log.d(TAG,"Exception with knownservices");
+            Log.e(TAG,"Error removing service.");
             e.printStackTrace();
           }
 
@@ -290,7 +286,6 @@ public class MDNS extends CordovaPlugin {
 
       result.setKeepCallback(true);
       callback.sendPluginResult(result);
-//      this.callback.success(status);
 
     } catch (JSONException e) {
 
@@ -338,27 +333,27 @@ public class MDNS extends CordovaPlugin {
   }
 
   private static String ServiceMD5(ServiceInfo info) {
-  JSONArray addresses = new JSONArray();
-  String[] add = info.getHostAddresses();
-  for (int i = 0; i < add.length; i++) {
-    addresses.put(add[i]);
-  }
-  try {
-      String raw = info.getType()+addresses.toString()+Integer.toString(info.getPort())+info.getQualifiedName();
-      MessageDigest md = MessageDigest.getInstance("MD5");
-      md.update(raw.getBytes("UTF-8"));
-      byte[] digest = md.digest();
-      StringBuffer hexString = new StringBuffer();
-      for (int i=0;i<digest.length;i++) {
-      String hex=Integer.toHexString(0xff & digest[i]);
-      if(hex.length()==1) hexString.append('0');
-      hexString.append(hex);
-      }
-      return hexString.toString();
-  } catch (Exception e) {
-    e.printStackTrace();
-    return null;
-  }
+    JSONArray addresses = new JSONArray();
+    String[] add = info.getHostAddresses();
+    for (int i = 0; i < add.length; i++) {
+      addresses.put(add[i]);
+    }
+    try {
+        String raw = info.getType()+addresses.toString()+Integer.toString(info.getPort())+info.getQualifiedName();
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        md.update(raw.getBytes("UTF-8"));
+        byte[] digest = md.digest();
+        StringBuffer hexString = new StringBuffer();
+        for (int i=0;i<digest.length;i++) {
+        String hex=Integer.toHexString(0xff & digest[i]);
+        if(hex.length()==1) hexString.append('0');
+        hexString.append(hex);
+        }
+        return hexString.toString();
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
+    }
   }
 
 }
